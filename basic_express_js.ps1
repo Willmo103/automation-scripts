@@ -3,12 +3,34 @@ New-Item .gitignore
 Write-Output /node_modules >> .gitignore
 Write-Output /.vscode >> .gitignore
 Write-Output /.idea >> .gitignore
-Write-Output /package-lock*.json >> .gitignore
+
+Write-Output '{
+  "name": "new express api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./frontend/app/index.js"
+  },
+  "author": "none",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.8.0",
+    "sequelize": "^6.25.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}' > package.json
 
 # init npm and install stuff
-npm init -y
-npm install express morgan jsonwebtoken bcryptjs bycrypt pg sequelize
-npm install nodemon -D
+npm install
 
 # create file structure
 mkdir app
@@ -18,8 +40,7 @@ Set-Location ./app
 mkdir models
 
 # Create a basic User Model
-Write-Output '
-const Sequelize = require("sequelize");
+Write-Output 'const Sequelize = require("sequelize");
 const db = require("../utils/database");
 
 const User = db.define("users", {
@@ -52,8 +73,7 @@ module.exports = User;
 mkdir controllers
 
 # Dev Controller
-Write-Output '
-const status = require("../utils/status");
+Write-Output 'const status = require("../utils/status");
 
 exports.version = (req, res, next) => {
   return res.status(200).json({ API_version: "0.0.1" });
@@ -61,8 +81,7 @@ exports.version = (req, res, next) => {
 ' > controllers/dev-controller.js
 
 # User Controller
-Write-Output '
-const User = Require("../models/user-model.js")
+Write-Output 'const User = require("../models/user-model.js")
 const {
   serverError,
   success,
@@ -200,8 +219,7 @@ exports.updateOneUser = async (req, res, next) => {
 ' > controllers/user-controller.js
 
 # Add logic for users to log in
-Write-Output '
-const { compare } = require("bcrypt");
+Write-Output 'const { compare } = require("bcrypt");
 const User = require("../models/user-model");
 const sign = require("jsonwebtoken").sign;
 const { jwtToken, badLogin, serverError } = require("../utils/status");
@@ -244,8 +262,7 @@ exports.loginUser = async (req, res) => {
 mkdir routers
 
 # User Router
-Write-Output '
-const {
+Write-Output 'const {
   getSelf,
   getOneUser,
   createOneUser,
@@ -267,17 +284,16 @@ module.exports = router;
 ' > routers/user-router.js
 
 # Dev Router
-Write-Output '
-const controller = require("../controllers/dev-controller");
+Write-Output 'const { version } = require("../controllers/dev-controller");
 const router = require("express").Router();
 
-router
-  .get("/version", controller.version)
+router.get("/version", version);
+
+module.exports = router;
 ' > routers/dev-router.js
 
 # Login Router
-Write-Output '
-const router = require("express").Router();
+Write-Output 'const router = require("express").Router();
 const { loginUser } = require("../controllers/login-controller");
 
 router.post("/", loginUser);
@@ -289,8 +305,7 @@ module.exports = router;
 mkdir utils
 
 # some utility functuons for hashing our passwords
-Write-Output '
-const { compare, hash } = require("bcrypt");
+Write-Output 'const { compare, hash } = require("bcrypt");
 const User = require("../models/user-model");
 
 exports.checkHashedPassword = async (reqPassword, storedPassword) => {
@@ -331,8 +346,7 @@ exports.buildNewUserModel = async (body = {}) => {
 ' > utils/utils.js
 
 # Create Our Database connection to our docker database instance
-Write-Output '
-const Sequelize = require("sequelize").Sequelize;
+Write-Output 'const Sequelize = require("sequelize").Sequelize;
 
 const sequelize = new Sequelize(
   process.env.PGDATABASE,
@@ -348,8 +362,7 @@ module.exports = sequelize;
 ' > utils/database.js
 
 # A class I wrote to standardize responses
-Write-Output '
-class Status {
+Write-Output 'class Status {
   constructor() {}
   serverError = (error) => {
     console.log(error);
@@ -439,8 +452,7 @@ module.exports = status;
 ' > utils/status.js
 
 # Create 0auth2 logic
-Write-Output '
-const { unauthorized, forbidden } = require("../utils/status");
+Write-Output 'const { unauthorized, forbidden } = require("../utils/status");
 
 const jwt = require("jsonwebtoken");
 
@@ -466,8 +478,7 @@ exports.authorize = (req, res, next) => {
 
 # Create Index.js file
 touch index.js
-Write-Output '
-const express = require("express");
+Write-Output 'const express = require("express");
 const morgan = require("morgan");
 const sequelize = require("./utils/database");
 
@@ -508,8 +519,7 @@ app.use("/login", require("./routers/login-router"))
 
 Set-Location ../
 
-Write-Output '
-FROM node:14
+Write-Output 'FROM node:14
 
 EXPOSE 5000
 
@@ -517,20 +527,20 @@ WORKDIR /src
 
 RUN npm install npm@latest -g
 
-COPY ../package.json package-lock*.json ./
+COPY package.json package-lock*.json ./
 
 RUN npm install
 
 COPY . .
 
 CMD [ "node", "app/index.js"]
+
 ' > Dockerfile
 
-Write-Output '
-version: "3.8"
+Write-Output 'version: "3.8"
 
 services:
-  node_backend:
+  express_api:
     container_name: New_API
     image: new-api_0.0.1
     build:
@@ -538,25 +548,27 @@ services:
     ports: ["5000:5000"]
     environment:
       - EXTERNAL_PORT=5000
-      - PGDATABASE=node_db
+      - PGDATABASE=new_db
       - PGUSER=user
       - PGPASSWORD=12345
-      - PGHOST=node_db
+      - PGHOST=new_db
       - TOKEN_KEY=Token-Key12345
       - EXPIRE_TIME=1h
-  node_db:
-    container_name: node_db
+  new_db:
+    container_name: new_db
     image: "postgres:12"
     ports: ["5432:5432"]
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=12345
-      - POSTGRES_DB=node_db
+      - POSTGRES_DB=new_db
     volumes:
-      - node_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  node_postgres_data: {}
+  postgres_data: {}
 ' > docker-compose.yml
 
 Write-Output "installation done. run 'docker-compose' to spin up database."
+
+
