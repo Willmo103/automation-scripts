@@ -2,6 +2,7 @@
 echo /node_modules > .gitignore
 echo /.vscode >> .gitignore
 echo /.idea >> .gitignore
+echo .env >> .gitignore
 
 # init npm and install stuff
 npm init -y

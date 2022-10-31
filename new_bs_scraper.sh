@@ -1,12 +1,12 @@
 #! /bin/bash
 
 # Create a Gitignore file and add starter stuff
-touch .gitignore
-echo /venv >> .gitignore
+echo /venv > .gitignore
 echo /.vscode >> .gitignore
 echo /.idea >> .gitignore
 echo /__pycache__ >> .gitignore
 echo /dev >> .gitignore
+echo .env >> .gitignore
 
 # create a virtual env
 python -m virtualenv venv
@@ -16,11 +16,7 @@ pip freeze > requirements.txt
 
 # Setup some sctructure
 mkdir dev
-touch ./dev/dev.py
-touch app.py
-touch scraper.py
 mkdir utils
-touch ./utils/utils.py
 
 # Write the code into the files we created
 echo "
@@ -46,7 +42,7 @@ def scrape(url):
 
 
 scrape('   ')
-" >> scraper.py
+" > scraper.py
 
 
 echo "
@@ -72,7 +68,7 @@ def dev_scrape(url):
 
 
 dev_scrape('   ')
-" >> dev/dev.py
+" > dev/dev.py
 
 echo "
 import os, platform
@@ -100,7 +96,7 @@ os.system(command)
 for i, item in enumerate(urls):
     print(f'Scraping {i} of {len(urls)}:')
     scrape(item)
-" >> app.py
+" > app.py
 
 echo "
 # utility functions for parsing your data goes here.
@@ -114,4 +110,4 @@ def remove_blank_lines(str: str) -> str:
         strings += line + '\n'
     return strings
 
-" >> utils/utils.py
+" > utils/utils.py

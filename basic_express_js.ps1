@@ -2,6 +2,7 @@
 Write-Output /node_modules > .gitignore
 Write-Output /.vscode >> .gitignore
 Write-Output /.idea >> .gitignore
+Write-Output .env >> .gitignore
 
 # init npm and install stuff
 npm init -y
