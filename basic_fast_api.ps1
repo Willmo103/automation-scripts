@@ -6,13 +6,13 @@ Write-Output /__pycache__ >> .\.gitignore
 
 python -m virtualenv venv
 venv/Scripts/activate
-pip install fastapi[all] sqlalchemy passlib[bcrypt]
+pip install fastapi[all] sqlalchemy passlib[bcrypt] psycopg2 python-jose[cryptography]
 pip freeze > requirements.txt
 
 mkdir app
 New-Item app/__init__.py
 
-Write-Output "from fastapi import FastAPI
+Write-Output 'from fastapi import FastAPI
 
 
 app = FastAPI()
@@ -28,4 +28,4 @@ app.add_middleware(
     )
 
 app.include_router(user.router)
-"
+' > app/main.py
