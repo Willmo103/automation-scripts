@@ -4,27 +4,36 @@ if (!$test) {
     New-Item "./" -ItemType "directory" -Name "utils"
 }
 
-Write-Output 'import os, time
-from datetime import datetime
+Write-Output 'def log(logfile: str = "./log.txt"):
+    """
+    A logging decorator. Writes or appends to an exsisting
+    log file.
 
+    Output file Schema:
+        Function (name of function)
+        args: (Tuple of arguments passed) kwargs: (Dict of keyword arguments)
+        Returned Value: (results of function)
+        Start time: (start time)
+        End time: (end time)
+        Finished in: ("the time delta)
 
-def log(logfile: str = "./log.txt"):
+    @params:logfile: <String> The location and name of the
+    logger output file.
+
+    @default: "./log.txt"
+    """
     def log_inner(func):
         def wrapper(*args, **kwargs):
             log_file: str = logfile
             log_out: str = "*****"
-            log_out += f"\nFunction: { func.__name__ } ran at: {datetime.now()}"
-            log_out += f"\nargs: { args }, kwargs:, { kwargs }"
-            start: float = time.time()
+            log_out += f"\nFunction {func.__name__} ran at: {datetime.now()}"
+            log_out += f"\nargs: {args}, kwargs:, {kwargs}"
+            start =  datetime.now()
             result = func(*args, **kwargs)
-            finished: float = time.time()
-            log_out += f"\nReturned value: { result }"
-            log_out += f"\nFinished at: {datetime.now()}"
+            finished =  datetime.now()
+            log_out += f"\nReturned value: {result}"
             log_out += f"\nStart time: {start}\nEnd time: {finished}"
-            if (finished - start) / 60 > 1:
-                log_out += f"""\nFinished in: {str((finished - start)/ 60).split(".")[0]} minute(s), {(finished - start ) % 60} seconds.\n"""
-            else:
-                log_out += f"\nFinished in: {(finished - start ) % 60} seconds\n"
+            log_out += f"\nFinished in: {finished - start}\n"
             if os.path.exists(log_file):
                 with open(log_file, "a") as f:
                     f.write(log_out)
