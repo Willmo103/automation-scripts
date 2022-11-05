@@ -4,7 +4,11 @@ if (!$test) {
     New-Item "./" -ItemType "directory" -Name "utils"
 }
 
-Write-Output 'def log(logfile: str = "./log.txt"):
+Write-Output '
+import os
+from datetime import datetime
+
+def log(logfile: str = "./log.txt"):
     """
     A logging decorator. Writes or appends to an exsisting
     log file.
