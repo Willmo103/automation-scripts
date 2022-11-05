@@ -39,7 +39,7 @@ Set-Alias -Name new-py -Value 'C:/Program Files/new_py_project.ps1'
 Set-Alias -Name py-log -Value 'C:/Program Files/logger_decorator.ps1'
 Set-Alias -Name sort-dir -Value 'C:/Program Files/sort_files_lite.ps1'
 Set-Alias -Name git-i -Value 'C:/Program Files/gitignore.ps1'
-Write-Output 'Created Aliases for commands: nano, touch, py-log, sort-dir, git-i, new-[exp, node, bs, py]" >> Profile.ps1
+Write-Output 'Created Aliases for commands: nano, touch, py-log, sort-dir, git-i, new-[exp, node, bs, py]'" >> Profile.ps1
 
 Write-Output "Profile Set, Returning to starting directory"
 Set-Location $current_dir

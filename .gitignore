@@ -1,5 +1,3 @@
-*
-!.gitignore
-!*.ps1
-!*.sh
-
+/venv
+/.idea
+/.vscode
