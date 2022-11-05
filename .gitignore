@@ -1,3 +1,6 @@
 /venv
 /.idea
 /.vscode
+*.egg*
+__pycache__
+book.json
