@@ -147,141 +147,141 @@ def unpackj(data, r=0, first=True):
             print(f"{indent(r + 1)}Value: (Data-Type: {type(data).__name__}, Length: N/A)")
 
 
-def editj(data, choice="", _key="", first=True, **kwargs):
-    # Define elements that reset each recursion
-    current_keys = []
+# def editj(data, choice="", _key="", first=True, **kwargs):
+#     # Define elements that reset each recursion
+#     current_keys = []
 
-    # an array of the choices a user can make for editing json files
-    choices = [
-        {"choice": "edit", "description": "Edit An item in the current tier"},
-        {"choice": "back", "description": "migrate back up the tree by one level"},
-        {"choice": "continue", "description": "Migrate Down the tree by one level"},
-        {"choice": "save", "description": "Update the original json file with all edits"},
-        {"choice": "exit", "description": "Exit (All unsaved changes will be lost)"}
-        ]
+#     # an array of the choices a user can make for editing json files
+#     choices = [
+#         {"choice": "edit", "description": "Edit An item in the current tier"},
+#         {"choice": "back", "description": "migrate back up the tree by one level"},
+#         {"choice": "continue", "description": "Migrate Down the tree by one level"},
+#         {"choice": "save", "description": "Update the original json file with all edits"},
+#         {"choice": "exit", "description": "Exit (All unsaved changes will be lost)"}
+#         ]
 
-    # Set up the first call to this function to load
-    # the json data into the current keys variable
-    if first:
-        root_data = data
-        # set the bool to false so this only
-        # happens the on the first call to editJ()
-        first = False
+#     # Set up the first call to this function to load
+#     # the json data into the current keys variable
+#     if first:
+#         root_data = data
+#         # set the bool to false so this only
+#         # happens the on the first call to editJ()
+#         first = False
 
-        # fill the current keys list
-        for i, key in enumerate(data):
-            value = data[key]
-            key_choice = {"index": i, "key": key, "value": value, "type": type(value).__name__}
-            current_keys.append(key_choice)
+#         # fill the current keys list
+#         for i, key in enumerate(data):
+#             value = data[key]
+#             key_choice = {"index": i, "key": key, "value": value, "type": type(value).__name__}
+#             current_keys.append(key_choice)
 
-        # call the function again
-        editj(data, "continue", "", False, root_data=root_data, previous_keys=current_keys)
+#         # call the function again
+#         editj(data, "continue", "", False, root_data=root_data, previous_keys=current_keys)
 
-    # enter the recursive portion of this function
-    else:
+#     # enter the recursive portion of this function
+#     else:
 
-        # root_data will hold our entire json object so we
-        # can navigate up and down the tree and log our changes
-        root_data = kwargs["root_data"]
+#         # root_data will hold our entire json object so we
+#         # can navigate up and down the tree and log our changes
+#         root_data = kwargs["root_data"]
 
-        if choice == "continue":
+#         if choice == "continue":
 
-            # data will be whichever value from the json
-            # object that was passed on the last recursion
-            if type(data) == dict:
+#             # data will be whichever value from the json
+#             # object that was passed on the last recursion
+#             if type(data) == dict:
 
-                # _key will be passed with data to
-                # be used here to get the value
-                if _key:
-                    data = data.get(_key)
+#                 # _key will be passed with data to
+#                 # be used here to get the value
+#                 if _key:
+#                     data = data.get(_key)
 
-                # load the current keys with whatever data is passed
-                # **This might be where I can tell it to stop if data is a single item**
-                if data:
-                    for i, key in enumerate(data):
-                        value = data[key]
-                        key_choice = {"index": i, "key": key, "value": value, "type": type(value).__name__}
-                        current_keys.append(key_choice)
+#                 # load the current keys with whatever data is passed
+#                 # **This might be where I can tell it to stop if data is a single item**
+#                 if data:
+#                     for i, key in enumerate(data):
+#                         value = data[key]
+#                         key_choice = {"index": i, "key": key, "value": value, "type": type(value).__name__}
+#                         current_keys.append(key_choice)
 
-                # This is here to handle empty values, but may refactor
-                # **I might not need this block to handle empty values**
-                else:
-                    value = data[key]
-                    key_choice = {"index": 0, "key": _key, "value": value, "type": "null" }
-                    current_keys.append(key_choice)
+#                 # This is here to handle empty values, but may refactor
+#                 # **I might not need this block to handle empty values**
+#                 else:
+#                     value = data[key]
+#                     key_choice = {"index": 0, "key": _key, "value": value, "type": "null" }
+#                     current_keys.append(key_choice)
 
-            # Handle list value
-            elif type(data) == list:
+#             # Handle list value
+#             elif type(data) == list:
 
-                # key for an array will be the index in the array I want to access
-                if _key:
-                    data = data[_key]
+#                 # key for an array will be the index in the array I want to access
+#                 if _key:
+#                     data = data[_key]
 
-                # fill out the current keys array
-                if data:
-                    for i in range(len(data)):
-                        value = data[i]
-                        key_choice = {"index": i, "key": None, "value": value, "type": type(value).__name__}
-                        current_keys.append(key_choice)
+#                 # fill out the current keys array
+#                 if data:
+#                     for i in range(len(data)):
+#                         value = data[i]
+#                         key_choice = {"index": i, "key": None, "value": value, "type": type(value).__name__}
+#                         current_keys.append(key_choice)
 
-                # Again, this might go away
-                else:
-                    value = data[i]
-                    key_choice = {"index": i, "key": None, "value": value, "type": type(value).__name__}
-                    current_keys.append(key_choice)
+#                 # Again, this might go away
+#                 else:
+#                     value = data[i]
+#                     key_choice = {"index": i, "key": None, "value": value, "type": type(value).__name__}
+#                     current_keys.append(key_choice)
 
-            # Another sloppy check for loose variables
-            # **This will need refactoring
-            else:
-                current_keys.append({"index": 0, "key" : None, "value": data, "type": type(data).__name__})
+#             # Another sloppy check for loose variables
+#             # **This will need refactoring
+#             else:
+#                 current_keys.append({"index": 0, "key" : None, "value": data, "type": type(data).__name__})
 
-            # This loop displays all the entry objects so the user
-            # can make a choice on which one they would like to edit
-            for entry in current_keys:
-                print(f"{entry.get('index')}) Key: {entry.get('key')} Value: (Type: {entry.get('type')}) ")
+#             # This loop displays all the entry objects so the user
+#             # can make a choice on which one they would like to edit
+#             for entry in current_keys:
+#                 print(f"{entry.get('index')}) Key: {entry.get('key')} Value: (Type: {entry.get('type')}) ")
 
-            print("What would you like to do?")
+#             print("What would you like to do?")
 
-            # Listing the choice objects
-            for i, choice in enumerate(choices):
-                print(f"{i}) {choice.get('choice')} -- {choice.get('description')}")
+#             # Listing the choice objects
+#             for i, choice in enumerate(choices):
+#                 print(f"{i}) {choice.get('choice')} -- {choice.get('description')}")
 
-            # capture and validate the users choice
-            user_choice = int(input("Choice (#):\n> "))
-            while user_choice < 0 or user_choice > len(choices):
-                print("Invalid Choice!")
-                user_choice = int(input("Choice (#):\n> "))
+#             # capture and validate the users choice
+#             user_choice = int(input("Choice (#):\n> "))
+#             while user_choice < 0 or user_choice > len(choices):
+#                 print("Invalid Choice!")
+#                 user_choice = int(input("Choice (#):\n> "))
 
-            # changing users numerical answer to the string choice for the logic to work
-            user_choice = choices[user_choice].get("choice")
+#             # changing users numerical answer to the string choice for the logic to work
+#             user_choice = choices[user_choice].get("choice")
 
-            # Remaining logic for another continue choice
-            if user_choice == "continue":
+#             # Remaining logic for another continue choice
+#             if user_choice == "continue":
 
-                # list current tree items again
-                for entry in current_keys:
-                    print(f"{entry.get('index')}) Key: {entry.get('key')} Value: (Type: {type(entry.get('value'))}) ")
+#                 # list current tree items again
+#                 for entry in current_keys:
+#                     print(f"{entry.get('index')}) Key: {entry.get('key')} Value: (Type: {type(entry.get('value'))}) ")
 
-                # get users choice from the current keys object and validating
-                user_index_choice = int(input("which branch would you like to move down?\nChoice: (index #)> "))
-                while user_index_choice < 0 or user_index_choice > len(current_keys):
-                    print("Invalid Choice!")
-                    user_index_choice = int(input("which branch would you like to move down?\nChoice: (index #)> "))
+#                 # get users choice from the current keys object and validating
+#                 user_index_choice = int(input("which branch would you like to move down?\nChoice: (index #)> "))
+#                 while user_index_choice < 0 or user_index_choice > len(current_keys):
+#                     print("Invalid Choice!")
+#                     user_index_choice = int(input("which branch would you like to move down?\nChoice: (index #)> "))
 
-                # Putting together all the data to call this function again
-                _data = current_keys[user_index_choice].get("value")
-                _choice = user_choice
-                if not current_keys[user_index_choice].get("key"): #This line should take the type value from the current key object
-                    __key = current_keys[user_index_choice].get("index")
-                else:
-                    __key = current_keys[user_index_choice].get("key")
+#                 # Putting together all the data to call this function again
+#                 _data = current_keys[user_index_choice].get("value")
+#                 _choice = user_choice
+#                 if not current_keys[user_index_choice].get("key"): #This line should take the type value from the current key object
+#                     __key = current_keys[user_index_choice].get("index")
+#                 else:
+#                     __key = current_keys[user_index_choice].get("key")
 
-                # call the function again
-                editj(_data, _choice, __key, False, root_data=root_data, previous_keys=current_keys)
+#                 # call the function again
+#                 editj(_data, _choice, __key, False, root_data=root_data, previous_keys=current_keys)
 
-            else:
-                ...
-    # editj(data, choice, key, False, root_data=root_data)
+#             else:
+#                 ...
+#     # editj(data, choice, key, False, root_data=root_data)
 
 # CLICK command-line interface
 @click.command()
@@ -305,8 +305,8 @@ def json_tool(path, m: bool, l: bool, e: bool):
         mapj(data)
     if l:
         unpackj(data)
-    if e:
-        editj(data)
+    # if e:
+    #     editj(data)
 
 
 if __name__ == "__main__":
