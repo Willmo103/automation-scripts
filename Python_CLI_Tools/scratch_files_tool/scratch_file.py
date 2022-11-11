@@ -1,27 +1,33 @@
-import click, os, json, readline,  time
+import click, os, json, readline, time
+
 
 def input_with_prefill(prompt, text):
     text = str(text)
+
     def hook():
         readline.insert_text(text)
         readline.redisplay()
+
     readline.set_pre_input_hook(hook)
     result = input(prompt)
     readline.set_pre_input_hook()
     return result
 
+
 def save_entry(filepath, key, entry) -> None:
+    entry = set_type(entry)
     with open(filepath, "r") as f:
         data = json.load(f)
     data[key] = entry
-    with open(filepath, 'w') as f:
+    with open(filepath, "w") as f:
         json.dump(data, f)
+
 
 def delete_entry(filepath, key) -> str:
     with open(filepath, "r") as f:
-        data:dict = json.load(f)
+        data: dict = json.load(f)
     deleted = data.pop(key)
-    with open(filepath, 'w') as f:
+    with open(filepath, "w") as f:
         json.dump(data, f)
     print(f"deleted: '{key}'")
     time.sleep(2)
@@ -30,7 +36,7 @@ def delete_entry(filepath, key) -> str:
 def get_data(file_path) -> dict:
     new_data = {}
     if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             data = json.load(f)
         if data is None:
             with open(f, "w") as f:
@@ -47,6 +53,7 @@ def get_data(file_path) -> dict:
             data = json.load(f)
         return data
 
+
 def check_numerical_entry() -> int:
     choice = input("\nWhich # entry would you like to view?\n> ")
     while True:
@@ -56,42 +63,47 @@ def check_numerical_entry() -> int:
         except ValueError:
             print("Invalid selection, numerical values only!")
             choice = input("Which # entry would you like to view?\n> ")
-    return choice -1
+    return choice - 1
+
 
 def get_key_choice(choices) -> int:
     choice = check_numerical_entry()
     while choice not in range(choices):
         print(f"Invalid selection. Entry ({choice + 1}) does not exist.")
         choice = check_numerical_entry()
-    return choice - 1
+    return choice
+
 
 def get_user_file_choice(viewing=False, no_entries=False) -> str:
     x = {"choice": "x", "desc": "Exit"}
-    b = {"choice": "b", "desc": "Back to list view" }
+    b = {"choice": "b", "desc": "Back to list view"}
     d = {"choice": "d", "desc": "Delete this entry"}
-    n = {"choice": "n", "desc": "Create new entry" }
+    n = {"choice": "n", "desc": "Create new entry"}
     e = {"choice": "e", "desc": "Edit this entry"}
-    v = {"choice": "v", "desc": "View a specific entry" }
-    view_options = [ e, d, b, x]
-    menu_options = [ n, v, x ]
+    v = {"choice": "v", "desc": "View a specific entry"}
+    view_options = [e, d, b, x]
+    menu_options = [n, v, x]
 
     if viewing:
+        v_c = ["b", "d", "e", "x"]
         print("\nWhat would you like to do?")
         for option in view_options:
             print(f"'{option.get('choice')}' -- {option.get('desc')}")
         user_choice = input("> ")
-        while user_choice.lower() not in ['b', 'd', 'e', 'x']:
-            print("Invalid selection!\nChoices: ['b', 'd', 'e', 'x']")
+        while user_choice.lower() not in v_c:
+            print(f"Invalid selection!\nChoices: {v_c}")
             user_choice = input("> ")
     else:
         print("\nWhat would you like to do?")
+        nv_c = ["v", "n", "x"]
         for option in menu_options:
             print(f"'{option.get('choice')}' -- {option.get('desc')}")
         user_choice = input("> ")
-        while user_choice.lower() not in ['v', 'n','x']:
-            print("Invalid selection!\nChoices: ['v', 'n','x']")
+        while user_choice.lower() not in nv_c:
+            print(f"Invalid selection!\nChoices: {nv_c}")
             user_choice = input("> ")
     return user_choice.lower()
+
 
 def print_keys(data: dict) -> list[str]:
     items = []
@@ -101,26 +113,55 @@ def print_keys(data: dict) -> list[str]:
         items.append(key)
     return items
 
+
+def set_type(item):
+    try:
+        if "{" in item or "}" in item:
+            item = dict(item)
+        return item
+    except ValueError:
+        try:
+            if "[" in item or "]" in item:
+                item = list(item)
+            return item
+        except ValueError:
+            try:
+                item = int(item)
+                return item
+            except ValueError:
+                try:
+                    item = str(item)
+                    return item
+                except ValueError:
+                    return item
+
+
 @click.command()
-@click.option('-f', required=False, help="the file where your scratch files are stored")
-def scratch_file(f='') -> None:
+@click.option("-f", required=False, help="the file where your scratch files are stored")
+def scratch_file(f="") -> None:
     if f is None:
         f = "./scratch_files.json"
     q = "Enter 's' to save or 'e' to edit\n> "
-    viewing_entry = ''
+    viewing_entry = ""
     data: dict = get_data(f)
     items = print_keys(data)
     file_choice = get_user_file_choice()
     while file_choice != "x":
         data: dict = get_data(f)
-        os.system('cls')
-        if file_choice in ['v', 'b']:
+        os.system("cls")
+
+        if file_choice == 'm':
+            items = print_keys(data)
+            file_choice = get_user_file_choice()
+            continue
+
+        if file_choice in ["v", "b"]:
             if len(data.keys()) > 0:
                 items = print_keys(data)
                 choice = get_key_choice(len(data.keys()))
                 selection = data.get(items[choice])
                 viewing_entry = items[choice]
-                os.system('cls')
+                os.system("cls")
                 print(items[choice], selection, sep=": \n")
                 file_choice = get_user_file_choice(True)
                 continue
@@ -138,55 +179,59 @@ def scratch_file(f='') -> None:
                 print("Invalid entry!")
                 edit_check = input(q)
             while edit_check.lower() != "":
-                if edit_check.lower() == 'e':
+                if edit_check.lower() == "e":
                     edit_entry = input_with_prefill("Edit entry:\n", entry)
                     edit_check = input(q)
                 else:
                     save_entry(f, viewing_entry, edit_entry)
                     os.system("cls")
                     print("Data saved")
-                    time.sleep(2)
+                    time.sleep(1)
                     break
-            file_choice = "v"
-
+            file_choice = "m"
 
         if file_choice == "n":
             new_key = input("Enter a new key:\n> ")
-            os.system('cls')
+            os.system("cls")
             new_val = input("enter a new value\n> ")
-            os.system('cls')
+            os.system("cls")
             print(new_key, new_val, sep=": ")
             new_check = input(q)
-            while new_check != '':
-                while new_check.lower() not in ['e', 's']:
+            while new_check != "":
+                while new_check.lower() not in ["e", "s"]:
                     print("Invalid Input!")
                     new_check = input(q)
                 if new_check.lower() == "e":
                     new_key = input_with_prefill("Key:\n", new_key)
-                    os.system('cls')
+                    os.system("cls")
                     new_val = input_with_prefill("Entry:\n", new_val)
-                    os.system('cls')
+                    os.system("cls")
                     print(new_key, new_val, sep=": ")
                     new_check = input(q)
-                if new_check == 's':
+                if new_check == "s":
                     save_entry(f, new_key, new_val)
                     os.system("cls")
                     print(f"New entry '{new_key}' created")
-                    time.sleep(2)
+                    time.sleep(1)
                     break
-            file_choice = "v"
+            file_choice = "m"
             continue
 
         if file_choice == "d":
+            del_q = f"Are you sure you want to delete '{viewing_entry}'?\n(y/n)\n> "
             entry = data.get(viewing_entry)
-            delete_check = input(f"Are you sure you want to delete '{viewing_entry}'?\n(y/n)\n> ")
-            while delete_check.lower() not in ['y', 'n']:
+            delete_check = input(del_q)
+            while delete_check.lower() not in ["y", "n"]:
                 print("Invalid input")
-                delete_check = input(f"Are you sure you want to delete '{viewing_entry}'?\n(y/n)\n> ")
-            if delete_check.lower() == 'y':
+                delete_check = input(del_q)
+            if delete_check.lower() == "y":
                 delete_entry(f, viewing_entry)
                 file_choice = "v"
                 continue
             else:
                 file_choice = "v"
                 continue
+
+
+if __name__ == "__main__":
+    scratch_file()
