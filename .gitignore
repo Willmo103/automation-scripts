@@ -6,3 +6,4 @@ __pycache__
 book.json
 scratch_file.json
 scratch_files.json
+*log.json

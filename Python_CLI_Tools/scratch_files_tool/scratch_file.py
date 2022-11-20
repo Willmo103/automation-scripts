@@ -136,6 +136,14 @@ def set_type(item):
                     return item
 
 
+def unpack():
+    # recreate something like the json unpack function from the json tool
+    # recursively unpack data types of lists and arrays and offer the edit
+    # options provided in this tool
+    # cli, but return the choices used by this cli tool
+    ...
+
+
 @click.command()
 @click.option("-f", required=False, help="the file where your scratch files are stored")
 def scratch_file(f="") -> None:
@@ -150,7 +158,7 @@ def scratch_file(f="") -> None:
         data: dict = get_data(f)
         os.system("cls")
 
-        if file_choice == 'm':
+        if file_choice == "m":
             items = print_keys(data)
             file_choice = get_user_file_choice()
             continue
