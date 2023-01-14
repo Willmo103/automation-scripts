@@ -136,12 +136,18 @@ def set_type(item):
                     return item
 
 
-def unpack():
+def unpack_list(data):
     # recreate something like the json unpack function from the json tool
     # recursively unpack data types of lists and arrays and offer the edit
     # options provided in this tool
     # cli, but return the choices used by this cli tool
     ...
+
+
+def unpack_dict(data: dict):
+    for i, key in enumerate(data.keys()):
+        item = data.get(key)
+        print(item)
 
 
 @click.command()
