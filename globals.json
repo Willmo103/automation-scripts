@@ -1,0 +1,14 @@
+{
+  "ignore": [
+    ".venv",
+    "venv",
+    ".gitignore",
+    "__pycache__",
+    "build",
+    "dist",
+    ".env",
+    ".git",
+    "*egg*",
+    "*.json"
+  ]
+}
